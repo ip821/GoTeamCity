@@ -1,4 +1,4 @@
-package tc
+package teamcity
 
 import (
 	"encoding/json"
@@ -6,7 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"fmt"
-	"net/url"
+	"strings"
 )
 
 type Connection struct {
@@ -15,10 +15,9 @@ type Connection struct {
 	HttpClient http.Client
 }
 
-const getCurrebtUserMethod = "/2/myself"
-const search = "/2/search"
+const methodGetBuilds = "/builds"
 
-var EmptyJiraUser = JiraUser{}
+var EmptyBuildsResponse BuildsResponse = BuildsResponse{}
 
 func NewConnection(url string, loginData string) Connection {
 	return Connection{
@@ -28,19 +27,19 @@ func NewConnection(url string, loginData string) Connection {
 	}
 }
 
-func deserializeUserRequestFromReader(reader io.Reader) (jiraUserResponse, error) {
+func deserializeBuildsRequestFromReader(reader io.Reader) (BuildsResponse, error) {
 	bodyBuffer, err := ioutil.ReadAll(reader)
 	if err != nil{
-		return EmptyJiraUserResponse, err
+		return EmptyBuildsResponse, err
 	}
 
-	var userResponse jiraUserResponse
-	err = json.Unmarshal(bodyBuffer, &userResponse)	
+	var buildsResponse BuildsResponse
+	err = json.Unmarshal(bodyBuffer, &buildsResponse)	
 	if err != nil{
-		return EmptyJiraUserResponse, err
+		return EmptyBuildsResponse, err
 	}
 	
-	return userResponse, nil
+	return buildsResponse, nil
 }
 
 func (connection *Connection) doRequest(method string, params ...string) (*http.Response, error) {
@@ -65,7 +64,12 @@ func (connection *Connection) doRequest(method string, params ...string) (*http.
 		return nil, err
 	}
 	
-	request.Header.Add("Authorization: Basic ", connection.LoginData)
+	loginData := strings.Split(connection.LoginData, ":")
+	request.SetBasicAuth(loginData[0], loginData[1])
+	request.Header.Add("Accept", "application/json")
+		
+	fmt.Println(loginData[0])
+	fmt.Println(loginData[1])
 
 	response, err := connection.HttpClient.Do(request)
 
@@ -78,32 +82,17 @@ func (connection *Connection) doRequest(method string, params ...string) (*http.
 	return response, nil
 }
 
-func (connection *Connection) GetCurrentUser() (JiraUser, error) {
-	response, err := connection.doRequest(getCurrebtUserMethod)
+func (connection *Connection) GetBuilds() (BuildsResponse, error) {
+	response, err := connection.doRequest(methodGetBuilds)
 	if err != nil{
-		return EmptyJiraUser, err
+		return EmptyBuildsResponse, err
 	}
 	
 	defer response.Body.Close()
-	data, err := deserializeUserRequestFromReader(response.Body)
+	data, err := deserializeBuildsRequestFromReader(response.Body)
 	if err != nil{
-		return EmptyJiraUser, err
+		return EmptyBuildsResponse, err
 	}
 		
-	return data.JiraUser, nil
-}
-
-func (connection *Connection) GetIssuesByCriteria(query string) ([]JiraIssue, error) {
-	response, err := connection.doRequest(search, "fields=id,key", "jql="+url.QueryEscape(query))
-	if err != nil{
-		return nil, err
-	}
-	
-	defer response.Body.Close()
-	searchResult, err := deserializeSearchRequestFromReader(response.Body)
-	if err != nil{
-		return nil, err
-	}
-
-	return searchResult.Issues, nil
+	return data, nil
 }

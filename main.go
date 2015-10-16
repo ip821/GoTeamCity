@@ -3,7 +3,7 @@ package main
 
 import (
 	"fmt"
-	jira "GoJiraNotifier/Jira"
+	tc "GoTeamCity/teamcity"
 )
 
 func main() {
@@ -14,21 +14,14 @@ func main() {
 		return
 	}	
 
-	connection := jira.NewConnection(settings.Url, settings.LoginData)
+	connection := tc.NewConnection(settings.Url, settings.LoginData)
 
-	userObject, err := connection.GetCurrentUser()
+	buildsObject, err := connection.GetBuilds()
 	if err != nil{
 		fmt.Println(err.Error())
 		return
 	}	
-	fmt.Println(userObject)
+	fmt.Println(buildsObject)
 
-	issuesArray, err := connection.GetIssuesByCriteria(settings.FilterSearchString)
-	if err != nil{
-		fmt.Println(err.Error())
-		return
-	}	
-	
-	fmt.Println(issuesArray)
 //	fmt.Scanln()
 }

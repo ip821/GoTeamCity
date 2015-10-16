@@ -6,14 +6,12 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"strconv"
+//	"strconv"
 )
 
 type Settings struct {
 	Url                string
 	LoginData          string
-	FilterSearchString string
-	CheckPeriodMinutes int
 }
 
 func (settings *Settings) Load() error {
@@ -36,9 +34,6 @@ func (settings *Settings) Load() error {
 	}	
 
 	fmt.Println("Url: " + settings.Url)
-	fmt.Println("LoginData: " + settings.LoginData)
-	fmt.Println("FilterSearchString: " + settings.FilterSearchString)
-	fmt.Println("CheckPeriodMinutes: " + strconv.Itoa(settings.CheckPeriodMinutes))
-	
+
 	return nil
 }
