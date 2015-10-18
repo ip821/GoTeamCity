@@ -2,26 +2,34 @@
 package main
 
 import (
-	"fmt"
 	tc "GoTeamCity/teamcity"
+	"fmt"
+	"strings"
 )
 
 func main() {
 	settings := Settings{}
 	err := settings.Load()
-	if err != nil{
+	if err != nil {
 		fmt.Println(err.Error())
 		return
-	}	
+	}
 
-	connection := tc.NewConnection(settings.Url, settings.LoginData)
+	loginData := strings.Split(settings.LoginData, ":")
+	connection := tc.NewConnection(settings.Url, loginData[0], loginData[1])
+	manager := NewBuildStatusManager(connection, loginData[0])
 
-	buildsObject, err := connection.GetBuilds()
-	if err != nil{
-		fmt.Println(err.Error())
-		return
-	}	
-	fmt.Println(buildsObject)
+	buildTypes := strings.Split(settings.BuildTypes, ",")
+	fmt.Println(buildTypes)
 
-//	fmt.Scanln()
+	for _, item := range buildTypes {
+		fmt.Println(item)
+		buildStatus, err := manager.GetBuildStatus(item)
+		if err != nil {
+			fmt.Println(err)
+		}
+		fmt.Println(buildStatus)
+	}
+
+	//	fmt.Scanln()
 }

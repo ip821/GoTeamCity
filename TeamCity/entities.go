@@ -1,20 +1,20 @@
 // JiraIssue.go
 package teamcity
 
-import(
-	"fmt"
-)
-
-type Build struct{
-	Id int`json:"id"`
-	BuildTypeId string`json:"buildTypeId"`
-	Number string`json:"number"`
-	Status string`json:"status"`
-	State string`json:"state"`
+type Build struct {
+	Id          int    `json:"id"`
+	BuildTypeId string `json:"buildTypeId"`
+	Number      string `json:"number"`
+	Status      string `json:"status"`
+	State       string `json:"state"`
+	Branch      string `json:"branchName"`
 }
 
-func(b Build) String() string{
-	return fmt.Sprintf("\n{Id: %v, BuildTypeId: %v, Number: %v, Status: %v, State: %v}", b.Id, b.BuildTypeId, b.Number, b.Status, b.State)
+type Change struct {
+	Id       int    `json:"id"`
+	UserName string `json:"username"`
 }
 
-
+type Investigation struct {
+	UserName string `json:"username"`
+}
