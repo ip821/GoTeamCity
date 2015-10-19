@@ -8,6 +8,8 @@ import (
 )
 
 func main() {
+	StartAppUi()
+
 	settings := Settings{}
 	err := settings.Load()
 	if err != nil {
@@ -30,6 +32,5 @@ func main() {
 		}
 		fmt.Println(buildStatus)
 	}
-
 	//	fmt.Scanln()
 }
