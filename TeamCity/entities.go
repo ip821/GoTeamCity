@@ -15,6 +15,13 @@ type Change struct {
 	UserName string `json:"username"`
 }
 
+type User struct {
+	Id       int    `json:"id"`
+	UserName string `json:username`
+	Name     string `json:name`
+}
+
 type Investigation struct {
-	UserName string `json:"username"`
+	Id       string  `json:"id"`
+	Assignee User `json:"assignee"`
 }

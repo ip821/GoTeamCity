@@ -45,7 +45,7 @@ func (m *BuildStatusManager) GetBuildStatus(buildType string) (BuildStatus, erro
 	changes, err := m.Connection.GetChanges(firstFailedBuild.(tc.Build).Id)
 	buildStatus.LastFailedBuildChanges = changes.Changes
 
-	containsUserNameInChanges, err := From(changes.Changes).Where(func(s T) (bool, error) { return s.(*tc.Change).UserName == m.UserName, nil }).Any()
+	containsUserNameInChanges, err := From(changes.Changes).Where(func(s T) (bool, error) { return s.(tc.Change).UserName == m.UserName, nil }).Any()
 	buildStatus.IsPotentiallyBroken = containsUserNameInChanges
 	if err != nil {
 		return emptyBuildStatus, err
@@ -58,7 +58,7 @@ func (m *BuildStatusManager) GetBuildStatus(buildType string) (BuildStatus, erro
 
 	buildStatus.BuildTypeInvestigations = investigations.Investigations
 
-	containsUserNameInInvestiagations, err := From(investigations.Investigations).Where(func(s T) (bool, error) { return s.(*tc.Investigation).UserName == m.UserName, nil }).Any()
+	containsUserNameInInvestiagations, err := From(investigations.Investigations).Where(func(s T) (bool, error) { return s.(tc.Investigation).Assignee.UserName == m.UserName, nil }).Any()
 	buildStatus.IsAssigned = containsUserNameInInvestiagations
 	return buildStatus, nil
 }

@@ -9,5 +9,5 @@ type ChangesResponse struct {
 }
 
 type InvestigationsResponse struct {
-	Investigations []Investigation
+	Investigations []Investigation`json:"investigation"`
 }
