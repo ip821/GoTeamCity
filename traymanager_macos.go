@@ -9,40 +9,26 @@ package main
 #cgo LDFLAGS: -framework Cocoa
 #import <Cocoa/Cocoa.h>
 
-@interface EventHandler : NSObject <NSApplicationDelegate>
-
-- (IBAction)onOpenedClicked:(id)sender;
-
-@end
-
-@implementation EventHandler
-
-- (IBAction)onOpenedClicked:(id)sender
-{
-	NSString*myurl=@"ya.ru";
-  	NSURL *url = [NSURL URLWithString:myurl];
-	[[NSApplication sharedApplication] openURL: url];
-}
-
-@end
-
 int StartApp(void) {
 	printf("StartApp");
 
     [NSAutoreleasePool new];
-    [NSApplication sharedApplication];
+    id app = [NSApplication sharedApplication];
 
 	NSStatusBar *bar = [NSStatusBar systemStatusBar];
 
-	id eventHandler = [[EventHandler alloc] autorelease];
+	id onOpenClicked = [^{
+		[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString: @"http://ya.ru"]];
+	} autorelease];
+
 	id menu = [[NSMenu new] autorelease];
 
     id openMenuItem = [[[NSMenuItem alloc]
 		initWithTitle:@"Open TeamCity"
-        action:@selector(onOpenedClicked:)
+        action:@selector(invoke)
 		keyEquivalent:@"o"]
           	autorelease];
-	[openMenuItem setTarget: eventHandler];
+	[openMenuItem setTarget: onOpenClicked];
     [menu addItem:openMenuItem];
 
     id quitMenuItem = [[[NSMenuItem alloc]
