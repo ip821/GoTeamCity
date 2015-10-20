@@ -2,13 +2,13 @@
 package main
 
 import (
+	. "GoTeamCity/macos"
 	tc "GoTeamCity/teamcity"
 	"fmt"
 	"strings"
 )
 
 func main() {
-	StartAppUi()
 
 	settings := Settings{}
 	err := settings.Load()
@@ -17,9 +17,14 @@ func main() {
 		return
 	}
 
+	urlToOpen := strings.Replace(settings.Url, "httpAuth/app/rest", "", -1)
+	StartAppUi(urlToOpen)
+
 	loginData := strings.Split(settings.LoginData, ":")
-	connection := tc.NewConnection(settings.Url, loginData[0], loginData[1])
-	manager := NewBuildStatusManager(connection, loginData[0])
+	user := loginData[0]
+	pwd := loginData[1]
+	connection := tc.NewConnection(settings.Url, user, pwd)
+	manager := NewBuildStatusManager(connection, user)
 
 	buildTypes := strings.Split(settings.BuildTypes, ",")
 	fmt.Println(buildTypes)

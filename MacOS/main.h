@@ -1,34 +1,24 @@
-// traymanager_macos.go
+#pragma once
 
-// +build darwin
-
-package main
-
-/*
-#cgo CFLAGS: -x objective-c
-#cgo LDFLAGS: -framework Cocoa
-#import <Cocoa/Cocoa.h>
-
-int StartApp(void) {
+int StartApp(const char* strUrl) {
 	printf("StartApp");
 
     [NSAutoreleasePool new];
     id app = [NSApplication sharedApplication];
 
-	NSStatusBar *bar = [NSStatusBar systemStatusBar];
+	NSString* url = [[[NSString alloc] initWithUTF8String: strUrl] autorelease];
+	EventHandler* eventHandler = [[[EventHandler alloc] initWithUrlString: url] autorelease];
 
-	id onOpenClicked = [^{
-		[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString: @"http://ya.ru"]];
-	} autorelease];
+	NSStatusBar *bar = [NSStatusBar systemStatusBar];
 
 	id menu = [[NSMenu new] autorelease];
 
     id openMenuItem = [[[NSMenuItem alloc]
 		initWithTitle:@"Open TeamCity"
-        action:@selector(invoke)
+        action:@selector(onOpenClicked:)
 		keyEquivalent:@"o"]
           	autorelease];
-	[openMenuItem setTarget: onOpenClicked];
+	[openMenuItem setTarget: eventHandler];
     [menu addItem:openMenuItem];
 
     id quitMenuItem = [[[NSMenuItem alloc]
@@ -47,10 +37,4 @@ int StartApp(void) {
 
     [NSApp run];
     return 0;
-}
-*/
-import "C"
-
-func StartAppUi() {
-	C.StartApp()
 }
