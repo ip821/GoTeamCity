@@ -13,7 +13,28 @@ package macos
 */
 import "C"
 
+type StatusEnum int
+
+const (
+	BSuccess                   StatusEnum = 1
+	BFailed                               = 2
+	BFailedAndUserChangesFound            = 3
+	BAssigned                             = 4
+)
+
+type Status struct {
+	BuildsStatus StatusEnum
+}
+
 func StartAppUi(url string) {
 	strUrl := C.CString(url)
 	C.StartApp(strUrl)
+}
+
+func RunApp() {
+	C.RunApp()
+}
+
+func UpdateAppUi(status Status) {
+	C.UpdateAppUi(C.int(status.BuildsStatus))
 }

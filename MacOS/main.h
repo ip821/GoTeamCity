@@ -1,5 +1,8 @@
 #pragma once
 
+NSStatusItem* mainItem;
+EventHandler* eventHandler;
+
 int StartApp(const char* strUrl) {
 	printf("StartApp");
 
@@ -7,7 +10,7 @@ int StartApp(const char* strUrl) {
     id app = [NSApplication sharedApplication];
 
 	NSString* url = [[[NSString alloc] initWithUTF8String: strUrl] autorelease];
-	EventHandler* eventHandler = [[[EventHandler alloc] initWithUrlString: url] autorelease];
+	eventHandler = [[[EventHandler alloc] initWithUrlString: url] autorelease];
 
 	NSStatusBar *bar = [NSStatusBar systemStatusBar];
 
@@ -28,13 +31,25 @@ int StartApp(const char* strUrl) {
           	autorelease];
     [menu addItem:quitMenuItem];
 
-    NSStatusItem* theItem = [bar statusItemWithLength:NSVariableStatusItemLength];
-	[theItem autorelease];
+    mainItem = [bar statusItemWithLength:NSVariableStatusItemLength];
+	[mainItem autorelease];
 
-    [theItem setTitle: NSLocalizedString(@"TeamCity",@"")];
-    [theItem setHighlightMode:YES];
-	[theItem setMenu: menu];
+	[eventHandler setStatusItem: mainItem];
 
-    [NSApp run];
+    [mainItem setTitle: NSLocalizedString(@"TeamCity",@"")];
+    [mainItem setHighlightMode:YES];
+	[mainItem setMenu: menu];
+
     return 0;
+}
+
+void RunApp(){
+	[NSApp run];
+}
+
+void UpdateAppUi(int status){
+	dispatch_async(dispatch_get_main_queue(), ^
+    {
+		[eventHandler update: status];
+    });
 }

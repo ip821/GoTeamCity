@@ -13,12 +13,12 @@ type BuildStatusManager struct {
 }
 
 type BuildStatus struct {
-	BuildType               string
-	LastFailedBuildChanges  []tc.Change
-	BuildTypeInvestigations []tc.Investigation
-	IsBroken                bool
-	IsPotentiallyBroken     bool
-	IsAssigned              bool
+	BuildType                 string
+	LastFailedBuildChanges    []tc.Change
+	BuildTypeInvestigations   []tc.Investigation
+	IsBroken                  bool
+	IsPotentiallyBrokenByUser bool
+	IsAssigned                bool
 }
 
 var emptyBuildStatus BuildStatus = BuildStatus{}
@@ -46,7 +46,7 @@ func (m *BuildStatusManager) GetBuildStatus(buildType string) (BuildStatus, erro
 	buildStatus.LastFailedBuildChanges = changes.Changes
 
 	containsUserNameInChanges, err := From(changes.Changes).Where(func(s T) (bool, error) { return s.(tc.Change).UserName == m.UserName, nil }).Any()
-	buildStatus.IsPotentiallyBroken = containsUserNameInChanges
+	buildStatus.IsPotentiallyBrokenByUser = containsUserNameInChanges
 	if err != nil {
 		return emptyBuildStatus, err
 	}
