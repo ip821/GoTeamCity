@@ -1,14 +1,9 @@
-// traymanager_macos.go
+// +build windows
 
-// +build darwin
-
-package macos
+package windows
 
 /*
-#cgo CFLAGS: -x objective-c
-#cgo LDFLAGS: -framework Cocoa
-#import <Cocoa/Cocoa.h>
-#import "eventhandler.h"
+#include <windows.h>
 #include "main.h"
 */
 import "C"

@@ -2,13 +2,16 @@
 package main
 
 import (
-	. "GoTeamCity/macos"
 	"fmt"
 	"strings"
 	"time"
+	. "GoTeamCity/macos"
+	. "GoTeamCity/windows"
 )
 
 func main() {
+	InitMacOsPackage()
+	InitWindowsPackage()
 
 	settings := Settings{}
 	err := settings.Load()
@@ -19,9 +22,12 @@ func main() {
 
 	urlToOpen := strings.Replace(settings.Url, "httpAuth/app/rest", "", -1)
 	StartAppUi(urlToOpen)
-	//	Update(settings)
 	//	ticker := time.NewTicker(time.Minute * 1)
 	ticker := time.NewTicker(time.Second * 10)
-	go UpdateRoutine(settings, ticker.C)
+	go UpdateRoutine(settings, ticker.C, UpdateCallbackFunc)
 	RunApp()
+}
+
+func UpdateCallbackFunc(status Status){
+	UpdateAppUi(int(status.BuildsStatus))
 }

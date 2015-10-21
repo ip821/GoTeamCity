@@ -2,20 +2,34 @@
 package main
 
 import (
-	. "GoTeamCity/macos"
 	tc "GoTeamCity/teamcity"
 	"fmt"
 	"strings"
 	"time"
 )
 
-func UpdateRoutine(settings Settings, tickerC <-chan time.Time) {
+type StatusEnum int
+
+const (
+	BSuccess                   StatusEnum = 1
+	BFailed                               = 2
+	BFailedAndUserChangesFound            = 3
+	BAssigned                             = 4
+)
+
+type Status struct {
+	BuildsStatus StatusEnum
+}
+
+type UpdateCallback func(statuc Status)
+
+func UpdateRoutine(settings Settings, tickerC <-chan time.Time, updateCallback UpdateCallback) {
 	for range tickerC {
-		Update(settings)
+		Update(settings, updateCallback)
 	}
 }
 
-func Update(settings Settings) {
+func Update(settings Settings, updateCallback UpdateCallback) {
 	loginData := strings.Split(settings.LoginData, ":")
 	user := loginData[0]
 	pwd := loginData[1]
@@ -49,5 +63,5 @@ func Update(settings Settings) {
 		}
 	}
 	fmt.Println(overallStatus)
-	UpdateAppUi(overallStatus)
+	updateCallback(overallStatus)
 }
